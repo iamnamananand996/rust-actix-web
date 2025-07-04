@@ -6,6 +6,7 @@ A modern, secure REST API built with Rust using Actix-web framework, SeaORM for 
 
 - **User Authentication**: JWT-based authentication with registration and login endpoints
 - **User Management**: CRUD operations for user data
+- **Post Management**: Full CRUD operations for posts with user association
 - **Database Integration**: PostgreSQL integration using SeaORM
 - **Secure Password Hashing**: SHA-256 password hashing
 - **API Response Standardization**: Consistent JSON response structure
@@ -128,13 +129,13 @@ Content-Type: application/json
 }
 ```
 
-### Protected Endpoints
+### User Management Endpoints
 
-All endpoints under `/home` require authentication via Bearer token.
+All user endpoints require authentication via Bearer token.
 
-#### Get Personalized Greeting
+#### Get User by ID
 ```http
-GET /home/{name}
+GET /user/{id}
 Authorization: Bearer your-jwt-token
 ```
 
@@ -142,14 +143,20 @@ Authorization: Bearer your-jwt-token
 ```json
 {
   "status": 200,
-  "message": "Hello, John!",
-  "data": "John"
+  "message": "User found",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
 }
 ```
 
 #### List All Users
 ```http
-GET /home/users/list
+GET /user/users/list
 Authorization: Bearer your-jwt-token
 ```
 
@@ -157,12 +164,191 @@ Authorization: Bearer your-jwt-token
 ```json
 {
   "status": 200,
-  "message": "Found users 5",
+  "message": "Found 5 users",
   "data": [
     {
       "id": 1,
       "name": "John Doe",
       "email": "john@example.com",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### Update User
+```http
+PUT /user/update/{id}
+Authorization: Bearer your-jwt-token
+Content-Type: application/json
+
+{
+  "name": "John Updated"
+}
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "User updated",
+  "data": {
+    "id": 1,
+    "name": "John Updated",
+    "email": "john@example.com",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+### Post Management Endpoints
+
+All post endpoints require authentication via Bearer token.
+
+#### Get Post by ID
+```http
+GET /post/{id}
+Authorization: Bearer your-jwt-token
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Post found",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Sample Post",
+    "text": "This is a sample post content.",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### List All Posts
+```http
+GET /post/posts/list
+Authorization: Bearer your-jwt-token
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Posts found: 3",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Sample Post",
+      "text": "This is a sample post content.",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### Create Post
+```http
+POST /post/create
+Authorization: Bearer your-jwt-token
+Content-Type: application/json
+
+{
+  "user_id": "1",
+  "title": "New Post",
+  "text": "This is my new post content."
+}
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Post created",
+  "data": {
+    "id": 2,
+    "user_id": 1,
+    "title": "New Post",
+    "text": "This is my new post content.",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Update Post
+```http
+PUT /post/update/{id}
+Authorization: Bearer your-jwt-token
+Content-Type: application/json
+
+{
+  "title": "Updated Post Title",
+  "text": "Updated post content."
+}
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Post updated",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Updated Post Title",
+    "text": "Updated post content.",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Delete Post
+```http
+DELETE /post/delete/{id}
+Authorization: Bearer your-jwt-token
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Post deleted",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Deleted Post",
+    "text": "This post was deleted.",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Get My Posts
+```http
+GET /post/posts/my-posts
+Authorization: Bearer your-jwt-token
+```
+
+**Response:**
+```json
+{
+  "status": 200,
+  "message": "Posts found: 2",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "My First Post",
+      "text": "This is my first post.",
       "created_at": "2024-01-01T00:00:00Z",
       "updated_at": "2024-01-01T00:00:00Z"
     }
@@ -192,10 +378,12 @@ rust-actix-web/
 │   ├── main.rs                 # Application entry point
 │   ├── routes/
 │   │   ├── auth_routes.rs      # Authentication route definitions
-│   │   ├── home_routes.rs      # Home route definitions
+│   │   ├── user_routes.rs      # User route definitions
+│   │   ├── post_routes.rs      # Post route definitions
 │   │   ├── handlers/
 │   │   │   ├── auth_handler.rs # Authentication logic
-│   │   │   └── home_handler.rs # Home endpoint logic
+│   │   │   ├── user_handler.rs # User management logic
+│   │   │   └── post_handler.rs # Post management logic
 │   │   └── middlewares/
 │   │       └── auth_middlewares.rs # JWT authentication middleware
 │   └── utils/
@@ -205,10 +393,12 @@ rust-actix-web/
 │       └── jwt.rs              # JWT token utilities
 ├── entity/
 │   └── src/
-│       └── user.rs             # User entity model
+│       ├── user.rs             # User entity model
+│       └── post.rs             # Post entity model
 ├── migration/
 │   └── src/
-│       └── m20250703_135737_create_user_table.rs # Database migration
+│       ├── m20250703_135737_create_user_table.rs # User table migration
+│       └── m20220101_000001_create_post_table.rs # Post table migration
 ├── Cargo.toml                  # Project dependencies
 └── README.md
 ```
@@ -220,6 +410,7 @@ rust-actix-web/
 - **Input Validation**: Request body validation using Serde
 - **SQL Injection Prevention**: SeaORM provides protection against SQL injection
 - **Environment Variables**: Sensitive data stored in environment variables
+- **Route Protection**: Authentication middleware for protected routes
 
 ## 🧪 Testing
 
