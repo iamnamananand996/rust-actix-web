@@ -8,12 +8,12 @@ lazy_static::lazy_static! {
 
 fn set_address() -> String {
     dotenv::dotenv().ok();
-    std::env::var("ADDRESS").expect("ADDRESS must be set")
+    std::env::var("ADDRESS").unwrap_or("0.0.0.0".to_string())
 }
 
 fn set_port() -> u16 {
     dotenv::dotenv().ok();
-    std::env::var("PORT").expect("PORT must be set").parse::<u16>().expect("PORT must be a number")
+    std::env::var("PORT").unwrap_or("3000".to_string()).parse::<u16>().expect("PORT must be a number")
 }
 
 fn set_database_url() -> String {
@@ -23,6 +23,6 @@ fn set_database_url() -> String {
 
 fn set_jwt_secret() -> String {
     dotenv::dotenv().ok();
-    std::env::var("JWT_SECRET").expect("JWT_SECRET must be set")
+    std::env::var("JWT_SECRET").unwrap_or("secret".to_string())
 }
 

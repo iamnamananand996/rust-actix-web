@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, HttpResponse, Responder, body::BoxBody, http::StatusCode, web};
+use actix_web::{body::BoxBody, http::StatusCode, HttpRequest, HttpResponse, Responder, ResponseError};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -15,6 +15,38 @@ impl<T> ApiResponse<T> {
             message,
             data,
         }
+    }
+}
+
+impl<T> std::fmt::Debug for ApiResponse<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ApiResponse")
+            .field("status", &self.status)
+            .field("message", &self.message)
+            .field("data", &"<data>")
+            .finish()
+    }
+}
+
+impl<T> std::fmt::Display for ApiResponse<T>
+where
+    T: Serialize,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl<T> ResponseError for ApiResponse<T>
+where
+    T: Serialize,
+{
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(StatusCode::from_u16(self.status).unwrap())
+            .content_type("application/json")
+            .body(serde_json::to_string(&self).unwrap_or_else(|_| {
+                r#"{"status": 500, "message": "Serialization error", "data": null}"#.to_string()
+            }))
     }
 }
 

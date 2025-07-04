@@ -5,6 +5,7 @@ use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     error::ErrorInternalServerError,
     middleware::Next,
+    HttpMessage,
 };
 
 pub async fn auth_middleware(
@@ -28,6 +29,8 @@ pub async fn auth_middleware(
     if token.is_err() {
         return Err(ErrorInternalServerError("Unauthorized".to_string()));
     }
+
+    req.extensions_mut().insert(token.unwrap());
 
     // let user = User::find_by_id(token.unwrap().claims.sub).await.unwrap();
     next.call(req)
