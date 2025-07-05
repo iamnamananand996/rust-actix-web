@@ -1,4 +1,5 @@
 use actix_web::{App, HttpServer, middleware::Logger, web};
+use aws_sdk_s3::config::Region;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
 
@@ -52,13 +53,29 @@ async fn main() -> Result<(), MainError> {
         error: e.to_string(),
     })?;
 
+    // Initialize AWS S3 client
+    let aws_config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region(Region::new(utils::constants::AWS_REGION.clone()))
+        .load()
+        .await;
+
+    // Create S3 client with proper configuration
+    let s3_config = aws_sdk_s3::config::Builder::from(&aws_config)
+        .force_path_style(false) // Use virtual-hosted-style requests
+        .build();
+    let s3_client = aws_sdk_s3::Client::from_conf(s3_config);
+
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
-            .app_data(web::Data::new(AppState { db: db.clone() }))
+            .app_data(web::Data::new(AppState {
+                db: db.clone(),
+                s3_client: s3_client.clone(),
+            }))
             .configure(routes::user_routes::user_routes)
             .configure(routes::auth_routes::auth_routes)
             .configure(routes::post_routes::post_routes)
+            .configure(routes::file_routes::file_routes)
     })
     .bind(format!("{}:{}", address, port))
     .map_err(|e| MainError {
