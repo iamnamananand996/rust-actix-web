@@ -17,6 +17,7 @@ impl MigrationTrait for Migration {
                     .col(integer(Post::UserId).not_null())
                     .col(string(Post::Title))
                     .col(string(Post::Text))
+                    .col(string(Post::Banner))
                     .col(timestamp(Post::CreatedAt).default(Expr::current_timestamp()))
                     .col(timestamp(Post::UpdatedAt).default(Expr::current_timestamp()))
                     .to_owned(),
@@ -40,6 +41,7 @@ enum Post {
     UserId,
     Title,
     Text,
+    Banner,
     CreatedAt,
     UpdatedAt,
 }

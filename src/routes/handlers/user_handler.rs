@@ -59,6 +59,7 @@ pub async fn users(
 #[derive(Serialize, Deserialize, Debug)]
 struct UpdatePayload {
     name: String,
+    avatar: Option<String>,
 }
 
 #[put("/update/{id}")]
@@ -99,6 +100,7 @@ pub async fn update(
 
     let mut user: user::ActiveModel = user.into();
     user.name = Set(body.name.clone());
+    user.avatar = Set(body.avatar.clone());
 
     let updated_user = user.update(&state.db).await;
     match updated_user {

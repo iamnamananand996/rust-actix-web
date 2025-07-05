@@ -13,6 +13,7 @@ pub struct RegisterRequest {
     pub name: String,
     pub email: String,
     pub password: String,
+    pub avatar: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -28,6 +29,7 @@ pub struct UserResponse {
     pub email: String,
     pub created_at: String,
     pub updated_at: String,
+    pub avatar: Option<String>,
 }
 
 #[post("/register")]
@@ -39,6 +41,7 @@ pub async fn register(
         name: Set(body.name.clone()),
         email: Set(body.email.clone()),
         password: Set(digest(body.password.clone())),
+        avatar: Set(body.avatar.clone()),
         ..Default::default()
     };
 
@@ -114,6 +117,7 @@ pub async fn login(
             id: user.id,
             name: user.name,
             email: user.email,
+            avatar: user.avatar,
             created_at: user.created_at.to_string(),
             updated_at: user.updated_at.to_string(),
         },

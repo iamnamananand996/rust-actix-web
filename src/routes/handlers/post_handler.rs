@@ -9,12 +9,14 @@ pub struct CreatePostRequest {
     pub user_id: String, // Accept as string from JSON
     pub title: String,
     pub text: String,
+    pub banner: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UpdatePostRequest {
     pub title: String,
     pub text: String,
+    pub banner: Option<String>,
 }
 
 #[get("/{id}")]
@@ -78,6 +80,7 @@ pub async fn create_post(
         text: Set(body.text.clone()),
         created_at: Set(chrono::Utc::now().naive_utc()),
         updated_at: Set(chrono::Utc::now().naive_utc()),
+        banner: Set(body.banner.clone()),
         ..Default::default()
     };
 
@@ -110,6 +113,7 @@ pub async fn update_post(
             post_active.title = Set(body.title.clone());
             post_active.text = Set(body.text.clone());
             post_active.updated_at = Set(chrono::Utc::now().naive_utc());
+            post_active.banner = Set(body.banner.clone());
 
             let updated_post = post_active
                 .update(&state.db)

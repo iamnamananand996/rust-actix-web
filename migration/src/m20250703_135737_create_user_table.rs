@@ -15,6 +15,7 @@ impl MigrationTrait for Migration {
                     .col(string(User::Name).not_null())
                     .col(string(User::Email).unique_key().not_null())
                     .col(string(User::Password).not_null())
+                    .col(string(User::Avatar))
                     .col(timestamp(User::CreatedAt).default(Expr::current_timestamp()))
                     .col(timestamp(User::UpdatedAt).default(Expr::current_timestamp()))
                     .to_owned(),
@@ -38,6 +39,7 @@ enum User {
     Name,
     Email,
     Password,
+    Avatar,
     CreatedAt,
     UpdatedAt,
 }
