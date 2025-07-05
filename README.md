@@ -1,4 +1,4 @@
-# Rust Actix-Web CRUD Application
+# Rust Actix-Web Application
 
 A modern, secure REST API built with Rust using Actix-web framework, SeaORM for database operations, and JWT authentication.
 
