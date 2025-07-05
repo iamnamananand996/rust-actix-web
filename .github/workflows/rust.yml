@@ -69,7 +69,6 @@ jobs:
 
     - name: Run database migrations
       run: sea-orm-cli migrate up
-      working-directory: ./migration
 
     - name: Run tests
       run: cargo test --workspace --verbose
