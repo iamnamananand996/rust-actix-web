@@ -181,9 +181,7 @@ pub async fn users(
 
     Ok(ApiResponse::new(
         200,
-        format!(
-            "Users found: {total_items} (page {page} of {total_pages})"
-        ),
+        format!("Users found: {total_items} (page {page} of {total_pages})"),
         response,
     ))
 }
