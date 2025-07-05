@@ -1,4 +1,6 @@
-use actix_web::{body::BoxBody, http::StatusCode, HttpRequest, HttpResponse, Responder, ResponseError};
+use actix_web::{
+    HttpRequest, HttpResponse, Responder, ResponseError, body::BoxBody, http::StatusCode,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

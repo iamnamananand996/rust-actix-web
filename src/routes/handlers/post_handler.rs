@@ -1,7 +1,7 @@
 use crate::utils::{api_response::ApiResponse, app_state::AppState, jwt::JwtClaims};
 use actix_web::{delete, get, post, put, web};
 use chrono;
-use sea_orm::{ActiveModelTrait, EntityTrait, Set, ColumnTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -168,20 +168,18 @@ pub async fn delete_post(
     }
 }
 
-
-
 #[get("/posts/my-posts")]
 pub async fn get_posts_by_user(
     state: web::Data<AppState>,
     claims: JwtClaims,
 ) -> Result<ApiResponse<Vec<entity::post::Model>>, ApiResponse<String>> {
     let user_id = claims.user_id;
-    
+
     let posts_result = entity::post::Entity::find()
         .filter(entity::post::Column::UserId.eq(user_id))
         .all(&state.db)
         .await;
-    
+
     match posts_result {
         Ok(user_posts) => Ok(ApiResponse::new(
             200,

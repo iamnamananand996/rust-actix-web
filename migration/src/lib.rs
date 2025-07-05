@@ -1,7 +1,7 @@
 pub use sea_orm_migration::prelude::*;
 
-mod m20250703_135737_create_user_table;
 mod m20220101_000001_create_post_table;
+mod m20250703_135737_create_user_table;
 
 pub struct Migrator;
 

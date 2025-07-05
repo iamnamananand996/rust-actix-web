@@ -1,11 +1,10 @@
 use crate::utils::jwt::decode_jwt;
 use actix_web::{
-    Error,
+    Error, HttpMessage,
     body::MessageBody,
     dev::{ServiceRequest, ServiceResponse},
     error::ErrorInternalServerError,
     middleware::Next,
-    HttpMessage,
 };
 
 pub async fn auth_middleware(

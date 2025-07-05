@@ -1,7 +1,9 @@
 use std::future::{self, Ready};
 
 use crate::utils::constants::JWT_SECRET;
-use actix_web::{dev::Payload, error::ErrorBadRequest, FromRequest, HttpRequest, Error, HttpMessage};
+use actix_web::{
+    Error, FromRequest, HttpMessage, HttpRequest, dev::Payload, error::ErrorBadRequest,
+};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use serde::{Deserialize, Serialize};

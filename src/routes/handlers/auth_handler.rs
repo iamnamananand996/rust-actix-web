@@ -50,7 +50,11 @@ pub async fn register(
             format!("User created successfully: {}", user.id),
             user,
         )),
-        Err(db_err) => Err(ApiResponse::new(500, "Failed to create user".to_string(), db_err.to_string())),
+        Err(db_err) => Err(ApiResponse::new(
+            500,
+            "Failed to create user".to_string(),
+            db_err.to_string(),
+        )),
     }
 }
 
@@ -61,7 +65,10 @@ pub struct LoginRequest {
 }
 
 #[post("/login")]
-pub async fn login(state: web::Data<AppState>, body: web::Json<LoginRequest>) -> Result<ApiResponse<LoginResponse>, ApiResponse<String>> {
+pub async fn login(
+    state: web::Data<AppState>,
+    body: web::Json<LoginRequest>,
+) -> Result<ApiResponse<LoginResponse>, ApiResponse<String>> {
     let user = user::Entity::find()
         .filter(
             Condition::all()
@@ -73,13 +80,28 @@ pub async fn login(state: web::Data<AppState>, body: web::Json<LoginRequest>) ->
 
     let user = match user {
         Ok(user) => user,
-        Err(db_err) => return Err(ApiResponse::new(500, "Database error".to_string(), db_err.to_string())),
+        Err(db_err) => {
+            return Err(ApiResponse::new(
+                500,
+                "Database error".to_string(),
+                db_err.to_string(),
+            ));
+        }
     };
 
-    println!("user: {:?}, password: {:?}, email: {:?}", user, digest(body.password.clone()), body.email);
+    println!(
+        "user: {:?}, password: {:?}, email: {:?}",
+        user,
+        digest(body.password.clone()),
+        body.email
+    );
 
     if user.is_none() {
-        return Err(ApiResponse::new(401, "User not found".to_string(), "User not found".to_string()));   
+        return Err(ApiResponse::new(
+            401,
+            "User not found".to_string(),
+            "User not found".to_string(),
+        ));
     }
 
     let user = user.unwrap();
@@ -97,5 +119,9 @@ pub async fn login(state: web::Data<AppState>, body: web::Json<LoginRequest>) ->
         },
     };
 
-    Ok(ApiResponse::new(200, "Login successful".to_string(), response))
+    Ok(ApiResponse::new(
+        200,
+        "Login successful".to_string(),
+        response,
+    ))
 }

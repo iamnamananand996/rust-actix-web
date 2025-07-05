@@ -1,5 +1,5 @@
-use actix_web::{middleware::from_fn, web};
 use crate::routes::{handlers, middlewares::auth_middlewares};
+use actix_web::{middleware::from_fn, web};
 
 pub fn user_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
