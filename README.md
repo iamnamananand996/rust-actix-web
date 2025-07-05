@@ -5,8 +5,12 @@ A modern, secure REST API built with Rust using Actix-web framework, SeaORM for 
 ## 🚀 Features
 
 - **User Authentication**: JWT-based authentication with registration and login endpoints
-- **User Management**: CRUD operations for user data
+- **User Management**: CRUD operations for user data with advanced filtering
 - **Post Management**: Full CRUD operations for posts with user association
+- **Advanced Search & Filtering**: Search by name/email (users) and title/text (posts)
+- **Flexible Sorting**: Sort by creation date, name (users), or title (posts)
+- **Date Range Filtering**: Filter records by creation date ranges
+- **Pagination**: Efficient pagination for large datasets
 - **Database Integration**: PostgreSQL integration using SeaORM
 - **Secure Password Hashing**: SHA-256 password hashing
 - **API Response Standardization**: Consistent JSON response structure
@@ -154,26 +158,71 @@ Authorization: Bearer your-jwt-token
 }
 ```
 
-#### List All Users
+#### List All Users with Advanced Features
 ```http
 GET /user/users/list
 Authorization: Bearer your-jwt-token
+```
+
+**Query Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+- `limit` (optional): Items per page (default: 10, max: 100)
+- `search` (optional): Search term for name and email fields
+- `sort_by` (optional): Sort field - `created_at` or `name` (default: `created_at`)
+- `sort_order` (optional): Sort order - `asc` or `desc` (default: `desc`)
+- `start_date` (optional): Filter by creation date from (format: YYYY-MM-DD)
+- `end_date` (optional): Filter by creation date to (format: YYYY-MM-DD)
+
+**Examples:**
+
+Basic listing:
+```http
+GET /user/users/list?page=1&limit=10
+```
+
+Search users:
+```http
+GET /user/users/list?search=john
+```
+
+Sort by name ascending:
+```http
+GET /user/users/list?sort_by=name&sort_order=asc
+```
+
+Filter by date range:
+```http
+GET /user/users/list?start_date=2024-01-01&end_date=2024-12-31
+```
+
+Combined filters:
+```http
+GET /user/users/list?search=john&sort_by=created_at&sort_order=desc&start_date=2024-01-01&page=1&limit=20
 ```
 
 **Response:**
 ```json
 {
   "status": 200,
-  "message": "Found 5 users",
-  "data": [
-    {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@example.com",
-      "created_at": "2024-01-01T00:00:00Z",
-      "updated_at": "2024-01-01T00:00:00Z"
+  "message": "Users found: 5 (page 1 of 1)",
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "avatar": null
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 10,
+      "total_items": 5,
+      "total_pages": 1
     }
-  ]
+  }
 }
 ```
 
@@ -229,27 +278,72 @@ Authorization: Bearer your-jwt-token
 }
 ```
 
-#### List All Posts
+#### List All Posts with Advanced Features
 ```http
 GET /post/posts/list
 Authorization: Bearer your-jwt-token
+```
+
+**Query Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+- `limit` (optional): Items per page (default: 10, max: 100)
+- `search` (optional): Search term for title and text fields
+- `sort_by` (optional): Sort field - `created_at` or `title` (default: `created_at`)
+- `sort_order` (optional): Sort order - `asc` or `desc` (default: `desc`)
+- `start_date` (optional): Filter by creation date from (format: YYYY-MM-DD)
+- `end_date` (optional): Filter by creation date to (format: YYYY-MM-DD)
+
+**Examples:**
+
+Basic listing:
+```http
+GET /post/posts/list?page=1&limit=10
+```
+
+Search posts:
+```http
+GET /post/posts/list?search=tutorial
+```
+
+Sort by title ascending:
+```http
+GET /post/posts/list?sort_by=title&sort_order=asc
+```
+
+Filter by date range:
+```http
+GET /post/posts/list?start_date=2024-01-01&end_date=2024-12-31
+```
+
+Combined filters:
+```http
+GET /post/posts/list?search=tutorial&sort_by=created_at&sort_order=desc&start_date=2024-01-01&page=1&limit=20
 ```
 
 **Response:**
 ```json
 {
   "status": 200,
-  "message": "Posts found: 3",
-  "data": [
-    {
-      "id": 1,
-      "user_id": 1,
-      "title": "Sample Post",
-      "text": "This is a sample post content.",
-      "created_at": "2024-01-01T00:00:00Z",
-      "updated_at": "2024-01-01T00:00:00Z"
+  "message": "Posts found: 3 (page 1 of 1)",
+  "data": {
+    "posts": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "title": "Sample Post",
+        "text": "This is a sample post content.",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "banner": null
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 10,
+      "total_items": 3,
+      "total_pages": 1
     }
-  ]
+  }
 }
 ```
 
@@ -354,6 +448,56 @@ Authorization: Bearer your-jwt-token
     }
   ]
 }
+```
+
+## 🔍 Advanced Search & Filtering
+
+Both user and post endpoints support advanced search, sorting, and filtering capabilities:
+
+### Query Parameters
+
+| Parameter | Type | Description | Default | Example |
+|-----------|------|-------------|---------|---------|
+| `page` | number | Page number for pagination | 1 | `?page=2` |
+| `limit` | number | Items per page (max: 100) | 10 | `?limit=20` |
+| `search` | string | Search term for relevant fields | - | `?search=john` |
+| `sort_by` | string | Field to sort by | `created_at` | `?sort_by=name` |
+| `sort_order` | string | Sort direction (`asc` or `desc`) | `desc` | `?sort_order=asc` |
+| `start_date` | string | Filter from date (YYYY-MM-DD) | - | `?start_date=2024-01-01` |
+| `end_date` | string | Filter to date (YYYY-MM-DD) | - | `?end_date=2024-12-31` |
+
+### Search Fields
+
+| Endpoint | Search Fields |
+|----------|---------------|
+| `/user/users/list` | `name`, `email` |
+| `/post/posts/list` | `title`, `text` |
+
+### Sort Fields
+
+| Endpoint | Available Sort Fields |
+|----------|----------------------|
+| `/user/users/list` | `created_at`, `name` |
+| `/post/posts/list` | `created_at`, `title` |
+
+### Examples
+
+```bash
+# Search users by name or email
+curl -H "Authorization: Bearer <token>" \
+  "http://localhost:8080/user/users/list?search=john"
+
+# Get posts sorted by title in ascending order
+curl -H "Authorization: Bearer <token>" \
+  "http://localhost:8080/post/posts/list?sort_by=title&sort_order=asc"
+
+# Filter posts created in January 2024
+curl -H "Authorization: Bearer <token>" \
+  "http://localhost:8080/post/posts/list?start_date=2024-01-01&end_date=2024-01-31"
+
+# Complex query: search, sort, filter, and paginate
+curl -H "Authorization: Bearer <token>" \
+  "http://localhost:8080/user/users/list?search=admin&sort_by=created_at&sort_order=desc&start_date=2024-01-01&page=1&limit=5"
 ```
 
 ## 🔐 Authentication
