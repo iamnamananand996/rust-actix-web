@@ -43,7 +43,7 @@ async fn main() -> Result<(), MainError> {
     env_logger::init();
 
     let address = utils::constants::ADDRESS.clone();
-    let port = utils::constants::PORT.clone();
+    let port = *utils::constants::PORT;
     let db: DatabaseConnection = Database::connect(utils::constants::DATABASE_URL.clone())
         .await
         .map_err(|e| MainError {
@@ -77,7 +77,7 @@ async fn main() -> Result<(), MainError> {
             .configure(routes::post_routes::post_routes)
             .configure(routes::file_routes::file_routes)
     })
-    .bind(format!("{}:{}", address, port))
+    .bind(format!("{address}:{port}"))
     .map_err(|e| MainError {
         error: e.to_string(),
     })?

@@ -56,7 +56,7 @@ pub async fn upload_file(
         Err(e) => {
             return Err(ApiResponse::new(
                 500,
-                format!("Failed to read file: {}", e),
+                format!("Failed to read file: {e}"),
                 "".to_string(),
             ));
         }
@@ -65,7 +65,7 @@ pub async fn upload_file(
     if let Err(e) = file.read_to_end(&mut file_content) {
         return Err(ApiResponse::new(
             500,
-            format!("Failed to read file content: {}", e),
+            format!("Failed to read file content: {e}"),
             "".to_string(),
         ));
     }
@@ -106,7 +106,7 @@ pub async fn upload_file(
         }
         Err(e) => Err(ApiResponse::new(
             500,
-            format!("S3 upload failed: {}", e),
+            format!("S3 upload failed: {e}"),
             "".to_string(),
         )),
     }

@@ -36,7 +36,7 @@ pub fn generate_jwt(user_id: i32, email: String) -> Result<String, jsonwebtoken:
     let claims = JwtClaims {
         user_id,
         exp: (now + exp).timestamp() as usize,
-        iat: iat,
+        iat,
         email,
     };
 
