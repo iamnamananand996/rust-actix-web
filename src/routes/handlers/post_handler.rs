@@ -189,8 +189,7 @@ pub async fn posts(
     Ok(ApiResponse::new(
         200,
         format!(
-            "Posts found: {} (page {} of {})",
-            total_items, page, total_pages
+            "Posts found: {total_items} (page {page} of {total_pages})"
         ),
         response,
     ))

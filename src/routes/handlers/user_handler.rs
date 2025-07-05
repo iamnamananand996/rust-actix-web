@@ -1,7 +1,10 @@
 use actix_web::{get, put, web};
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait, PaginatorTrait, QueryOrder, QueryFilter, Condition, ColumnTrait};
-use serde::{Deserialize, Serialize};
 use chrono::NaiveDate;
+use sea_orm::{
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, Condition, EntityTrait, PaginatorTrait,
+    QueryFilter, QueryOrder,
+};
+use serde::{Deserialize, Serialize};
 
 use crate::utils::{api_response::ApiResponse, app_state::AppState};
 use entity::user;
@@ -70,16 +73,22 @@ pub async fn users(
 ) -> Result<ApiResponse<UsersResponse>, ApiResponse<String>> {
     let page = query.page.unwrap_or(1);
     let per_page = query.limit.unwrap_or(10);
-    
+
     // Ensure page is at least 1
     let page = if page < 1 { 1 } else { page };
-    
+
     // Limit per_page to reasonable bounds
-    let per_page = if per_page > 100 { 100 } else if per_page < 1 { 10 } else { per_page };
+    let per_page = if per_page > 100 {
+        100
+    } else if per_page < 1 {
+        10
+    } else {
+        per_page
+    };
 
     // Build query with filters
     let mut query_builder = user::Entity::find();
-    
+
     // Search by name and email
     if let Some(search_term) = &query.search {
         if !search_term.is_empty() {
@@ -89,7 +98,7 @@ pub async fn users(
             query_builder = query_builder.filter(search_condition);
         }
     }
-    
+
     // Date range filtering
     if let Some(start_date_str) = &query.start_date {
         match NaiveDate::parse_from_str(start_date_str, "%Y-%m-%d") {
@@ -106,7 +115,7 @@ pub async fn users(
             }
         }
     }
-    
+
     if let Some(end_date_str) = &query.end_date {
         match NaiveDate::parse_from_str(end_date_str, "%Y-%m-%d") {
             Ok(end_date) => {
@@ -122,11 +131,11 @@ pub async fn users(
             }
         }
     }
-    
+
     // Sorting
     let sort_by = query.sort_by.as_deref().unwrap_or("created_at");
     let sort_order = query.sort_order.as_deref().unwrap_or("desc");
-    
+
     match sort_by {
         "name" => {
             query_builder = if sort_order == "asc" {
@@ -168,14 +177,13 @@ pub async fn users(
         total_pages,
     };
 
-    let response = UsersResponse {
-        users,
-        pagination,
-    };
+    let response = UsersResponse { users, pagination };
 
     Ok(ApiResponse::new(
         200,
-        format!("Users found: {} (page {} of {})", total_items, page, total_pages),
+        format!(
+            "Users found: {total_items} (page {page} of {total_pages})"
+        ),
         response,
     ))
 }
