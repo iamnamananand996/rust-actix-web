@@ -1,9 +1,12 @@
-use actix_web::{rt, web, HttpRequest, HttpResponse, Error};
+use actix_web::{Error, HttpRequest, HttpResponse, rt, web};
 use actix_ws::{Message, handle};
 use futures_util::StreamExt as _;
 
 /// WebSocket handler using modern actix-web v4 approach
-pub async fn websocket_handler(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+pub async fn websocket_handler(
+    req: HttpRequest,
+    stream: web::Payload,
+) -> Result<HttpResponse, Error> {
     let (res, mut session, mut msg_stream) = handle(&req, stream)?;
 
     rt::spawn(async move {
@@ -27,4 +30,4 @@ pub async fn websocket_handler(req: HttpRequest, stream: web::Payload) -> Result
     });
 
     Ok(res)
-} 
+}
