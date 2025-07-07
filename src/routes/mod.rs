@@ -4,3 +4,4 @@ pub mod handlers;
 pub mod middlewares;
 pub mod post_routes;
 pub mod user_routes;
+pub mod websocket_routes;

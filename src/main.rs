@@ -76,6 +76,8 @@ async fn main() -> Result<(), MainError> {
             .configure(routes::auth_routes::auth_routes)
             .configure(routes::post_routes::post_routes)
             .configure(routes::file_routes::file_routes)
+            .configure(routes::websocket_routes::websocket_routes)
+            .configure(routes::websocket_routes::websocket_api_routes)
     })
     .bind(format!("{address}:{port}"))
     .map_err(|e| MainError {
